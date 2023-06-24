@@ -3,7 +3,7 @@ const path = require('path')
 
 module.exports = {
     output: {
-        path: path.join(__dirname, '/dist'),
+        path: path.resolve(__dirname, 'dist'),
         filename: 'bundle.js',
     },
     plugins: [
@@ -13,6 +13,12 @@ module.exports = {
     ],
     devServer: {
         port: 5000,
+        static: {
+            directory: path.resolve(__dirname, 'static'),
+        },
+        proxy: {
+            '/api': 'http://localhost:3000',
+        }
     },
     resolve: {
         extensions: ['.tsx', '.ts', '.js'],

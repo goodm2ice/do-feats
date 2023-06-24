@@ -6,12 +6,14 @@
   "scripts": {
     "build": "webpack --mode production",
     "start": "webpack serve --mode development",
-    "services": "npx openapi -i http://127.0.0.1:8000/openapi.json -o src/api"
+    "services": "npx openapi -i http://localhost:8000/openapi.json -o src/api"
   },
+  "proxy": "http://localhost:8000/",
   "keywords": [],
   "author": "goodmice",
   "license": "ISC",
   "dependencies": {
+    "antd": "^5.6.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.14.0"
@@ -20,6 +22,7 @@
     "@babel/core": "^7.22.5",
     "@babel/preset-env": "^7.22.5",
     "@babel/preset-react": "^7.22.5",
+    "@types/antd": "^1.0.0",
     "@types/react": "^18.2.14",
     "@types/react-dom": "^18.2.6",
     "@types/react-router-dom": "^5.3.3",
