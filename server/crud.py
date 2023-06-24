@@ -23,7 +23,7 @@ def delete_language(db: Session, language_id: int):
 
 
 def update_language(db: Session, language_id: int, language: schemas.LanguageCreate):
-    db.query(models.Language).filter(models.Language.id == language_id).update(**language.dict())
+    db.query(models.Language).filter(models.Language.id == language_id).update(language.dict())
     db.commit()
     return True
 
@@ -70,13 +70,41 @@ def create_topic(db: Session, topic: schemas.TopicCreate):
 
 
 def update_topic(db: Session, topic_id: int, topic: schemas.TopicCreate):
-    db.query(models.Topic).filter(models.Topic.id == topic_id).update(**topic.dict())
+    db.query(models.Topic).filter(models.Topic.id == topic_id).update(topic.dict())
     db.commit()
     return True
 
 
 def delete_topic(db: Session, topic_id: int):
     db.query(models.Topic).filter(models.Topic.id == topic_id).delete()
+    db.commit()
+    return True
+
+
+def get_translation(db: Session, translation_id: int):
+    return db.query(models.Translation).filter(models.Translation.id == translation_id).first()
+
+
+def get_translations_by_word(db: Session, word_id: int):
+    return db.query(models.Translation).filter(models.Translation.word_id == word_id).all()
+
+
+def create_translation(db: Session, translation: schemas.TranslationCreate):
+    db_translation = models.Translation(**translation.dict())
+    db.add(db_translation)
+    db.commit()
+    db.refresh(db_translation)
+    return db_translation
+
+
+def update_translation(db: Session, translation_id: int, translation: schemas.TranslationCreate):
+    db.query(models.Translation).filter(models.Translation.id == translation_id).update(**translation.dict())
+    db.commit()
+    return True
+
+
+def delete_translation(db: Session, translation_id: int):
+    db.query(models.Translation).filter(models.Translation.id == translation_id).delete()
     db.commit()
     return True
 
@@ -94,7 +122,7 @@ def create_word(db: Session, word: schemas.WordCreate):
 
 
 def update_word(db: Session, word_id: int, word: schemas.WordCreate):
-    db.query(models.Word).filter(models.Word.id == word_id).update(**word.dict())
+    db.query(models.Word).filter(models.Word.id == word_id).update(word.dict())
     db.commit()
     return True
 
@@ -103,3 +131,40 @@ def delete_word(db: Session, word_id: int):
     db.query(models.Word).filter(models.Word.id == word_id).delete()
     db.commit()
     return True
+
+
+def get_words(db: Session, language_id: int | None = None, translation_language_id: int | None = None, topic_id: int | None = None):
+    q = db.query(models.Word)
+    if translation_language_id:
+        q = db.query(models.Word, models.Translation)\
+            .filter(models.Word.id == models.Translation.word_id)\
+            .filter(models.Translation.language_id == translation_language_id)
+    if language_id is not None:
+        q = q.filter(models.Word.language_id == language_id)
+    if topic_id is not None:
+        q = q.filter(models.Word.topic_id == topic_id)
+    if not translation_language_id:
+        return q.all()
+
+    result = []
+    for word, translation in q.all():
+        word.translation = translation
+        result.append(word)
+
+    return result
+
+
+def get_random_words(db: Session, language_id: int, translation_language_id: int, count: int, topic_id: int | None = None):
+    q = db.query(models.Word, models.Translation)\
+        .filter(models.Word.id == models.Translation.word_id)\
+        .filter(models.Word.language_id == language_id)\
+        .filter(models.Translation.language_id == translation_language_id)
+    if topic_id is not None:
+        q = q.filter(models.Word.topic_id == topic_id)
+
+    result = []
+    for word, translation in q.limit(count).all():
+        word.translation = translation
+        result.append(word)
+
+    return result

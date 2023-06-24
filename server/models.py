@@ -51,4 +51,4 @@ class Translation(Base):
     language_id = Column(Integer, ForeignKey('languages.id'), nullable=False)
 
     language = relationship('Language')
-    word = relationship('Word')
+    word = relationship('Word', cascade='all,delete')

@@ -55,11 +55,12 @@ class TranslationBase(BaseModel):
 
 class TranslationCreate(TranslationBase):
     language_id: int
+    word_id: int
 
 
 class Translation(TranslationBase):
     id: int
-    language: Language
+    Language: Language
 
     class Config:
         orm_mode = True
@@ -78,7 +79,8 @@ class WordCreate(WordBase):
 class Word(WordBase):
     id: int
     language: Language
-    topic: Topic
+    topic: Topic | None = None
+    translation: Translation | None = None
 
     class Config:
         orm_mode = True

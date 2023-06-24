@@ -95,6 +95,31 @@ def delete_topic(topic_id: int, db: Session = Depends(get_db), token: str = Depe
     return crud.delete_topic(db, topic_id)
 
 
+@app.get('/translations/{translation_id}', response_model=schemas.Translation, tags=['Translations'])
+def get_translation(translation_id: int, db: Session = Depends(get_db)):
+    return crud.get_translation(db, translation_id)
+
+
+@app.get('/translations/by_word/{word_id}', response_model=schemas.Translation, tags=['Translations'])
+def get_translation_by_word(word_id: int, db: Session = Depends(get_db)):
+    return crud.get_translations_by_word(db, word_id)
+
+
+@app.post('/translations/', response_model=schemas.Translation, tags=['Translations'])
+def create_translation(translation: schemas.TranslationCreate, db: Session = Depends(get_db), token: str = Depends(oauth2)):
+    return crud.create_translation(db, translation)
+
+
+@app.put('/translations/{translation_id}', response_model=bool, tags=['Translations'])
+def update_translation(translation_id: int, translation: schemas.TranslationCreate, db: Session = Depends(get_db), token: str = Depends(oauth2)):
+    return crud.update_translation(db, translation_id, translation)
+
+
+@app.delete('/translations/{translation_id}', response_model=bool, tags=['Translations'])
+def delete_translation(translation_id: int, db: Session = Depends(get_db), token: str = Depends(oauth2)):
+    return crud.delete_translation(db, translation_id)
+
+
 @app.get('/words/{word_id}', response_model=schemas.Word, tags=['Words'])
 def get_word(word_id: int, db: Session = Depends(get_db)):
     return crud.get_word(db, word_id)
@@ -113,3 +138,11 @@ def update_word(word_id: int, word: schemas.WordCreate, db: Session = Depends(ge
 @app.delete('/words/{word_id}', response_model=bool, tags=['Words'])
 def update_word(word_id: int, db: Session = Depends(get_db), token: str = Depends(oauth2)):
     return crud.delete_word(db, word_id)
+
+@app.get('/words/', response_model=list[schemas.Word], tags=['Words'])
+def get_words(language_id: int | None = None, translation_language_id: int | None = None, topic_id: int | None = None, db: Session = Depends(get_db)):
+    return crud.get_words(db, language_id, translation_language_id, topic_id)
+
+@app.get('/words/random/', response_model=list[schemas.Word], tags=['Words'])
+def get_random_words(language_id: int, translation_language_id: int, count: int, topic_id: int | None = None, db: Session = Depends(get_db)):
+    return crud.get_random_words(db, language_id, translation_language_id, count, topic_id)
