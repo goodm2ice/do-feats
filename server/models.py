@@ -15,7 +15,7 @@ class User(Base):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True, index=True)
-    login = Column(String, unique=True, nullable=False)
+    username = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
     native_language_id = Column(Integer, ForeignKey('languages.id'), nullable=True)
     native_language = relationship('Language')

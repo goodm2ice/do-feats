@@ -28,8 +28,8 @@ def update_language(db: Session, language_id: int, language: schemas.LanguageCre
     return True
 
 
-def get_user_by_login(db: Session, user_login: str):
-    return db.query(models.User).filter(models.User.login == user_login).first()
+def get_user_by_username(db: Session, username: str):
+    return db.query(models.User).filter(models.User.username == username).first()
 
 
 def get_user(db: Session, user_id: int):
@@ -38,7 +38,7 @@ def get_user(db: Session, user_id: int):
 
 def create_user(db: Session, user: schemas.UserCreate):
     db_user = models.User(
-        login = user.login,
+        username = user.username,
         password = bcrypt.hash(user.password),
         native_language_id = user.native_language_id,
     )
@@ -48,8 +48,8 @@ def create_user(db: Session, user: schemas.UserCreate):
     return db_user
 
 
-def authenticate_user(db: Session, login: str, password: str):
-    db_user = get_user_by_login(db, login)
+def authenticate_user(db: Session, username: str, password: str):
+    db_user = get_user_by_username(db, username)
     if not db_user:
         return False
     if not bcrypt.verify(password, db_user.password):

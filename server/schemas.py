@@ -17,7 +17,7 @@ class Language(LanguageBase):
 
 
 class UserBase(BaseModel):
-    login: str
+    username: str
 
 
 class UserCreate(UserBase):
@@ -27,7 +27,14 @@ class UserCreate(UserBase):
 
 class User(UserBase):
     id: int
-    native_language: Language
+    native_language: Language | None = None
+
+    class Config:
+        orm_mode = True
+
+class UserWithToken(User):
+    access_token: str
+    token_type: str = 'bearer'
 
     class Config:
         orm_mode = True

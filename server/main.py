@@ -17,7 +17,7 @@ app = FastAPI(
     redoc_url=BASE_API_URL + '/redoc'
 )
 
-oauth2 = OAuth2PasswordBearer(tokenUrl='token')
+oauth2 = OAuth2PasswordBearer(tokenUrl='login')
 
 # Dependency
 def get_db():
@@ -28,16 +28,24 @@ def get_db():
         db.close()
 
 
-@app.post(BASE_API_URL + '/token', tags=['Login'], operation_id='login')
-def generate_token(input_data : OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+@app.post(BASE_API_URL + '/login', response_model=schemas.UserWithToken, tags=['Login'], operation_id='login')
+def login(input_data : OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = crud.authenticate_user(db, input_data.username, input_data.password)
     if not user:
         raise HTTPException(status_code=400, detail='Incorrect username or password')
-    
-    user_obj = schemas.User.from_orm(user)
-    token = jwt.encode(user_obj.dict(), JWT_SECRET)
 
-    return { 'access_token': token, 'token_type': 'bearer' }
+    user.access_token = jwt.encode(schemas.User.from_orm(user).dict(), JWT_SECRET)
+    return schemas.UserWithToken.from_orm(user)
+
+
+@app.post(BASE_API_URL + '/register', response_model=schemas.UserWithToken, tags=['Login'], operation_id='register')
+def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    db_user = crud.get_user_by_username(db, user.username)
+    if db_user:
+        raise HTTPException(status_code=400, detail='Username is busy')
+    user = crud.create_user(db, user)
+    user.access_token = jwt.encode(schemas.User.from_orm(user).dict(), JWT_SECRET)
+    return schemas.UserWithToken.from_orm(user)
 
 
 @app.get(BASE_API_URL + '/languages/', response_model=list[schemas.Language], tags=['Languages'], operation_id='GetAll')
@@ -70,9 +78,9 @@ def get_user(user_id: int, db: Session = Depends(get_db), token: str = Depends(o
 
 @app.post(BASE_API_URL + '/users/', response_model=schemas.User, tags=['Users'], operation_id='Insert')
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db), token: str = Depends(oauth2)):
-    db_user = crud.get_user_by_login(db, user.login)
+    db_user = crud.get_user_by_username(db, user.username)
     if db_user:
-        raise HTTPException(status_code=400, detail='Login already registered')
+        raise HTTPException(status_code=400, detail='Username already registered')
     return crud.create_user(db, user)
 
 
@@ -83,7 +91,7 @@ def get_topics(db: Session = Depends(get_db)):
 
 @app.post(BASE_API_URL + '/topics/', response_model=schemas.Topic, tags=['Topics'], operation_id='Insert')
 def create_topic(topic: schemas.TopicCreate, db: Session = Depends(get_db), token: str = Depends(oauth2)):
-    db_topics = crud.get_topics()
+    db_topics = crud.get_topics(db)
     if topic.title in [t.title for t in db_topics]:
         raise HTTPException(status_code=400, detail='Topic already exists')
     return crud.create_topic(db, topic)
