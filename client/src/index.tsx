@@ -9,9 +9,6 @@ import App from './App'
 
 import './styles/index.less'
 
-const vh = window.innerHeight * 0.01
-document.documentElement.style.setProperty('--vh', `${vh}px`)
-
 OpenAPI.TOKEN = async () => getUser()?.access_token || ''
 
 const el = document.getElementById('app')
