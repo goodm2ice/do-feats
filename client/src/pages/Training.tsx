@@ -1,7 +1,7 @@
 import '../styles/home.less'
 
-export const Home = () => (
+export const Training = () => (
     <>Hello, world!</>
 )
 
-export default Home
+export default Training
