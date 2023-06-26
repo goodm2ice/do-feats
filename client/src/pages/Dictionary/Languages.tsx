@@ -57,54 +57,60 @@ export const Languages = () => {
 
     useEffect(update, [update])
 
-    return selectedLanguageIdx !== null ? (
-        <>
-            <NavBar onBack={() => changeSelectedLanguage(null)} back={'Отмена'}>
-                {selectedLanguage?.title || 'Добавить'}
-            </NavBar>
-            <Form
-                form={form}
-                onFinish={onFinish}
-                footer={(
-                    <Space direction={'vertical'} block>
-                        <Button block color={'primary'} type={'submit'}>Сохранить</Button>
-                        {selectedLanguage && (
-                            <Button block color={'danger'} onClick={makeOnDelete(selectedLanguage.title, () => deleteLanguage(selectedLanguage.id))}>
-                                Удалить
-                            </Button>
+    return (
+        <div className={'df-page'}>
+            {selectedLanguageIdx !== null ? (
+                <>
+                    <NavBar onBack={() => changeSelectedLanguage(null)} back={'Отмена'}>
+                        {selectedLanguage?.title || 'Добавить'}
+                    </NavBar>
+                    <Form
+                        form={form}
+                        onFinish={onFinish}
+                        footer={(
+                            <Space direction={'vertical'} block>
+                                <Button block color={'primary'} type={'submit'}>Сохранить</Button>
+                                {selectedLanguage && (
+                                    <Button block color={'danger'} onClick={makeOnDelete(selectedLanguage.title, () => deleteLanguage(selectedLanguage.id))}>
+                                        Удалить
+                                    </Button>
+                                )}
+                            </Space>
                         )}
-                    </Space>
-                )}
-            >
-            <Form.Item hidden name={'id'}><Input /></Form.Item>
-                <Form.Item name={'title'} label={'Название языка'} rules={[{ required: true, message: 'Это обязательное поле!' }]}>
-                    <Input placeholder={'中文'} />
-                </Form.Item>
-            </Form>
-        </>
-    ) : (
-        <Space direction={'vertical'} block>
-            <Button block onClick={() => changeSelectedLanguage(-1)}>Добавить язык</Button>
-            {languages?.length > 0 ? (
-                <List>
-                    {languages.map((lang, i) => (
-                        <SwipeAction
-                            key={lang.id}
-                            leftActions={[{
-                                key: 'delete',
-                                text: 'Удалить',
-                                color: 'danger',
-                                onClick: makeOnDelete(lang.title, () => deleteLanguage(lang.id)),
-                            }]}
-                        >
-                            <List.Item onClick={() => changeSelectedLanguage(i)}>{lang.title}</List.Item>
-                        </SwipeAction>
-                    ))}
-                </List>
+                    >
+                    <Form.Item hidden name={'id'}><Input /></Form.Item>
+                        <Form.Item name={'title'} label={'Название языка'} rules={[{ required: true, message: 'Это обязательное поле!' }]}>
+                            <Input placeholder={'中文'} />
+                        </Form.Item>
+                    </Form>
+                </>
             ) : (
-                <ErrorBlock status={'empty'} title={'Пусто!'} description={'Ни один язык ещё не добавлен!'} />
+                <>
+                    <div className={'df-scrollable'} style={{ flex: 1 }}>
+                        {languages?.length > 0 ? (
+                            <List>
+                                {languages.map((lang, i) => (
+                                    <SwipeAction
+                                        key={lang.id}
+                                        leftActions={[{
+                                            key: 'delete',
+                                            text: 'Удалить',
+                                            color: 'danger',
+                                            onClick: makeOnDelete(lang.title, () => deleteLanguage(lang.id)),
+                                        }]}
+                                    >
+                                        <List.Item onClick={() => changeSelectedLanguage(i)}>{lang.title}</List.Item>
+                                    </SwipeAction>
+                                ))}
+                            </List>
+                        ) : (
+                            <ErrorBlock status={'empty'} title={'Пусто!'} description={'Ни один язык ещё не добавлен!'} />
+                        )}
+                    </div>
+                    <Button block onClick={() => changeSelectedLanguage(-1)} style={{ marginTop: 15 }}>Добавить язык</Button>
+                </>
             )}
-        </Space>
+        </div>
     )
 }
 

@@ -57,54 +57,60 @@ export const Topics = () => {
 
     useEffect(update, [update])
 
-    return selectedTopicIdx !== null ? (
-        <>
-            <NavBar onBack={() => changeSelectedTopic(null)} back={'Отмена'}>
-                {selectedTopic?.title || 'Добавить'}
-            </NavBar>
-            <Form
-                form={form}
-                onFinish={onFinish}
-                footer={(
-                    <Space direction={'vertical'} block>
-                        <Button block color={'primary'} type={'submit'}>Сохранить</Button>
-                        {selectedTopic && (
-                            <Button block color={'danger'} onClick={makeOnDelete(selectedTopic.title, () => deleteTopic(selectedTopic.id))}>
-                                Удалить
-                            </Button>
+    return (
+        <div className={'df-page'}>
+            {selectedTopicIdx !== null ? (
+                <>
+                    <NavBar onBack={() => changeSelectedTopic(null)} back={'Отмена'}>
+                        {selectedTopic?.title || 'Добавить'}
+                    </NavBar>
+                    <Form
+                        form={form}
+                        onFinish={onFinish}
+                        footer={(
+                            <Space direction={'vertical'} block>
+                                <Button block color={'primary'} type={'submit'}>Сохранить</Button>
+                                {selectedTopic && (
+                                    <Button block color={'danger'} onClick={makeOnDelete(selectedTopic.title, () => deleteTopic(selectedTopic.id))}>
+                                        Удалить
+                                    </Button>
+                                )}
+                            </Space>
                         )}
-                    </Space>
-                )}
-            >
-                <Form.Item hidden name={'id'}><Input /></Form.Item>
-                <Form.Item name={'title'} label={'Название темы'} rules={[{ required: true, message: 'Это обязательное поле!' }]}>
-                    <Input placeholder={'Семья'} />
-                </Form.Item>
-            </Form>
-        </>
-    ) : (
-        <Space direction={'vertical'} block>
-            <Button block onClick={() => changeSelectedTopic(-1)}>Добавить тему</Button>
-            {topics?.length > 0 ? (
-                <List>
-                    {topics.map((topic, i) => (
-                        <SwipeAction
-                            key={topic.id}
-                            leftActions={[{
-                                key: 'delete',
-                                text: 'Удалить',
-                                color: 'danger',
-                                onClick: makeOnDelete(topic.title, () => deleteTopic(topic.id)),
-                            }]}
-                        >
-                            <List.Item onClick={() => changeSelectedTopic(i)}>{topic.title}</List.Item>
-                        </SwipeAction>
-                    ))}
-                </List>
+                    >
+                        <Form.Item hidden name={'id'}><Input /></Form.Item>
+                        <Form.Item name={'title'} label={'Название темы'} rules={[{ required: true, message: 'Это обязательное поле!' }]}>
+                            <Input placeholder={'Семья'} />
+                        </Form.Item>
+                    </Form>
+                </>
             ) : (
-                <ErrorBlock status={'empty'} title={'Пусто!'} description={'Ни одна тема ещё не добавлена!'} />
+                <>
+                    <div className={'df-scrollable'} style={{ flex: 1 }}>
+                        {topics?.length > 0 ? (
+                            <List>
+                                {topics.map((topic, i) => (
+                                    <SwipeAction
+                                        key={topic.id}
+                                        leftActions={[{
+                                            key: 'delete',
+                                            text: 'Удалить',
+                                            color: 'danger',
+                                            onClick: makeOnDelete(topic.title, () => deleteTopic(topic.id)),
+                                        }]}
+                                    >
+                                        <List.Item onClick={() => changeSelectedTopic(i)}>{topic.title}</List.Item>
+                                    </SwipeAction>
+                                ))}
+                            </List>
+                        ) : (
+                            <ErrorBlock status={'empty'} title={'Пусто!'} description={'Ни одна тема ещё не добавлена!'} />
+                        )}
+                    </div>
+                    <Button block onClick={() => changeSelectedTopic(-1)} style={{ marginTop: 15 }}>Добавить тему</Button>
+                </>
             )}
-        </Space>
+        </div>
     )
 }
 

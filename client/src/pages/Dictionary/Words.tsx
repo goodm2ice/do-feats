@@ -80,77 +80,83 @@ export const Words = () => {
         ]])
     }), [])
 
-    return selectedWordIdx !== null ? (
-        <>
-            <NavBar onBack={() => changeSelectedWord(null)} back={'Отмена'}>
-                {selectedWord?.title || 'Добавить'}
-            </NavBar>
-            <Form
-                form={form}
-                onFinish={onFinish}
-                footer={(
-                    <Space direction={'vertical'} block>
-                        <Button block color={'primary'} type={'submit'}>Сохранить</Button>
-                        {selectedWord && (
-                            <Button block color={'danger'} onClick={makeOnDelete(selectedWord.title, () => deleteWord(selectedWord.id))}>
-                                Удалить
-                            </Button>
+    return (
+        <div className={'df-page'}>
+            {selectedWordIdx !== null ? (
+                <>
+                    <NavBar onBack={() => changeSelectedWord(null)} back={'Отмена'}>
+                        {selectedWord?.title || 'Добавить'}
+                    </NavBar>
+                    <Form
+                        form={form}
+                        onFinish={onFinish}
+                        footer={(
+                            <Space direction={'vertical'} block>
+                                <Button block color={'primary'} type={'submit'}>Сохранить</Button>
+                                {selectedWord && (
+                                    <Button block color={'danger'} onClick={makeOnDelete(selectedWord.title, () => deleteWord(selectedWord.id))}>
+                                        Удалить
+                                    </Button>
+                                )}
+                            </Space>
                         )}
-                    </Space>
-                )}
-            >
-                <Form.Item hidden name={'id'}><Input /></Form.Item>
-                <Form.Item name={'title'} label={'Слово'} rules={requiredRules}>
-                    <Input placeholder={'单词'} />
-                </Form.Item>
-                <Form.Item name={'pronunciation'} label={'Произношение'} rules={requiredRules}>
-                    <Input placeholder={'dāncí'} />
-                </Form.Item>
-                <Form.Item name={'language_id'} label={'Язык слова'} rules={requiredRules} trigger={'onConfirm'}>
-                    <Picker columns={languages}>
-                        {(items, actions) => (
-                            <Button size={'small'} onClick={actions.open}>{items[0]?.label || 'Не указан'}</Button>
-                        )}
-                    </Picker>
-                </Form.Item>
-                <Form.Item name={'topic_id'} label={'Тема'} trigger={'onConfirm'}>
-                    <Picker columns={topics}>
-                        {(items, actions) => (
-                            <Button size={'small'} onClick={actions.open}>{items[0]?.label || 'Не указана'}</Button>
-                        )}
-                    </Picker>
-                </Form.Item>
-            </Form>
-        </>
-    ) : (
-        <Space direction={'vertical'} block>
-            <Button block onClick={() => changeSelectedWord(-1)}>Добавить слово</Button>
-            {words?.length > 0 ? (
-                <List>
-                    {words.map((word, i) => (
-                        <SwipeAction
-                            key={word.id}
-                            leftActions={[{
-                                key: 'delete',
-                                text: 'Удалить',
-                                color: 'danger',
-                                onClick: makeOnDelete(word.title, () => deleteWord(word.id)),
-                            }]}
-                        >
-                            <List.Item
-                                description={word.pronunciation}
-                                extra={`${word.language?.title || ''}, ${word.topic?.title || ''}`}
-                                onClick={() => changeSelectedWord(i)}
-                            >
-                                {word.title}
-                            </List.Item>
-                        </SwipeAction>
-                    ))}
-                </List>
+                    >
+                        <Form.Item hidden name={'id'}><Input /></Form.Item>
+                        <Form.Item name={'title'} label={'Слово'} rules={requiredRules}>
+                            <Input placeholder={'单词'} />
+                        </Form.Item>
+                        <Form.Item name={'pronunciation'} label={'Произношение'} rules={requiredRules}>
+                            <Input placeholder={'dāncí'} />
+                        </Form.Item>
+                        <Form.Item name={'language_id'} label={'Язык слова'} rules={requiredRules} trigger={'onConfirm'}>
+                            <Picker columns={languages}>
+                                {(items, actions) => (
+                                    <Button size={'small'} onClick={actions.open}>{items[0]?.label || 'Не указан'}</Button>
+                                )}
+                            </Picker>
+                        </Form.Item>
+                        <Form.Item name={'topic_id'} label={'Тема'} trigger={'onConfirm'}>
+                            <Picker columns={topics}>
+                                {(items, actions) => (
+                                    <Button size={'small'} onClick={actions.open}>{items[0]?.label || 'Не указана'}</Button>
+                                )}
+                            </Picker>
+                        </Form.Item>
+                    </Form>
+                </>
             ) : (
-                <ErrorBlock status={'empty'} title={'Пусто!'} description={'Ни одного слова ещё не добавлено!'} />
+                <>
+                    <div className={'df-scrollable'} style={{ flex: 1 }}>
+                        {words?.length > 0 ? (
+                            <List>
+                                {words.map((word, i) => (
+                                    <SwipeAction
+                                        key={word.id}
+                                        leftActions={[{
+                                            key: 'delete',
+                                            text: 'Удалить',
+                                            color: 'danger',
+                                            onClick: makeOnDelete(word.title, () => deleteWord(word.id)),
+                                        }]}
+                                    >
+                                        <List.Item
+                                            description={word.pronunciation}
+                                            extra={`${word.language?.title || ''}, ${word.topic?.title || ''}`}
+                                            onClick={() => changeSelectedWord(i)}
+                                        >
+                                            {word.title}
+                                        </List.Item>
+                                    </SwipeAction>
+                                ))}
+                            </List>
+                        ) : (
+                            <ErrorBlock status={'empty'} title={'Пусто!'} description={'Ни одного слова ещё не добавлено!'} />
+                        )}
+                    </div>
+                    <Button block onClick={() => changeSelectedWord(-1)} style={{ marginTop: 15 }}>Добавить слово</Button>
+                </>
             )}
-        </Space>
+        </div>
     )
 }
 
